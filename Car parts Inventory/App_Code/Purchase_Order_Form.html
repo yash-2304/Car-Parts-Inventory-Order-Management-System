@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Purchase Order Creation Request Form</title>
+</head>
+<body>
+  <h1>Purchase Order Creation Request</h1>
+  <form id="purchaseOrderForm">
+    <label for="buyerName">Buyer Name:</label>
+    <input type="text" id="buyerName" name="buyerName" required>
+    <br>
+    <input type="checkbox" id="useBuyerInfo" name="useBuyerInfo">
+    <label for="useBuyerInfo">Use Buyer Info for Shipping</label>
+    <br>
+    <div id="shippingDetails">
+      <label for="shipToStreet">Street:</label>
+      <input type="text" id="shipToStreet" name="shippingStreet">
+      <br>
+      <label for="shipToCity">City:</label>
+      <input type="text" id="shipToCity" name="shippingCity">
+      <br>
+      <label for="shipToName">Ship To Name:</label>
+      <input type="text" id="shipToName" name="shipToName">
+      <br>
+      <label for="shipToContact">Contact:</label>
+      <input type="text" id="shipToContact" name="shipToContact">
+    </div>
+    <div id="lineItems">
+      <h2>Line Items</h2>
+      <div class="line-item">
+        <label for="inventoryId">Inventory ID:</label>
+        <input type="number" class="inventoryId">
+        <label for="itemQuantity">Quantity:</label>
+        <input type="number" class="itemQuantity">
+        <br>
+      </div>
+      <!-- Add more line item fields as needed -->
+    </div>
+    <button type="button" id="addLineItem">Add Line Item</button>
+    <br>
+    <button type="submit">Submit Order</button>
+  </form>
+
+  <script>
+    const form = document.getElementById('purchaseOrderForm');
+
+    form.addEventListener('submit', async function(event) {
+      event.preventDefault(); // Prevent the default form submission
+
+      const formData = new FormData(form);
+      const requestBody = {};
+
+      const lineItems = [];
+      const lineItemDivs = document.querySelectorAll('.line-item');
+      lineItemDivs.forEach((lineItemDiv) => {
+        const inventoryId = lineItemDiv.querySelector('.inventoryId').value;
+        const itemQuantity = lineItemDiv.querySelector('.itemQuantity').value;
+        lineItems.push({ inventoryId, itemQuantity });
+      });
+
+      requestBody['lineItems'] = lineItems;
+
+      formData.forEach((value, key) => {
+        requestBody[key] = value;
+      });
+
+      try {
+        const response = await fetch('http://localhost:9000/submit-order', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestBody),
+        });
+
+        if (response.ok) {
+          alert('Order submitted successfully!');
+          // Optionally, perform actions upon successful submission
+        } else {
+          throw new Error('Failed to submit order');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Error submitting order');
+        // Handle errors or display appropriate messages
+      }
+    });
+
+    const useBuyerInfoCheckbox = document.getElementById('useBuyerInfo');
+    const shippingDetails = document.getElementById('shippingDetails');
+
+    useBuyerInfoCheckbox.addEventListener('change', function() {
+      if (this.checked) {
+        shippingDetails.style.display = 'none';
+      } else {
+        shippingDetails.style.display = 'block';
+      }
+    });
+
+    const addLineItemButton = document.getElementById('addLineItem');
+    const lineItemsContainer = document.getElementById('lineItems');
+
+    addLineItemButton.addEventListener('click', function() {
+      const lineItemDiv = document.createElement('div');
+      lineItemDiv.classList.add('line-item');
+
+      const inventoryIdLabel = document.createElement('label');
+      inventoryIdLabel.textContent = 'Inventory ID:';
+      const inventoryIdInput = document.createElement('input');
+      inventoryIdInput.type = 'number';
+      inventoryIdInput.classList.add('inventoryId');
+
+      const quantityLabel = document.createElement('label');
+      quantityLabel.textContent = 'Quantity:';
+      const quantityInput = document.createElement('input');
+      quantityInput.type = 'number';
+      quantityInput.classList.add('itemQuantity');
+
+      lineItemDiv.appendChild(inventoryIdLabel);
+      lineItemDiv.appendChild(inventoryIdInput);
+      lineItemDiv.appendChild(quantityLabel);
+      lineItemDiv.appendChild(quantityInput);
+
+      lineItemsContainer.appendChild(lineItemDiv);
+    });
+  </script>
+</body>
+</html>

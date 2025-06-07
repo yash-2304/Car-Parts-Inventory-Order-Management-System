@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Purchase Order Information</title>
+</head>
+<body>
+    <h1>Purchase Order Information</h1>
+
+    <label for="orderId">Order ID:</label>
+    <input type="text" id="orderId" />
+
+    <button onclick="searchOrder()">Search</button>
+
+    <hr>
+
+    <h2>Update Payment Status</h2>
+
+    <label for="paymentCheckbox">Paid:</label>
+    <input type="checkbox" id="paymentCheckbox" />
+
+    <button onclick="updatePaymentStatus()">Update Status</button>
+
+    <table id="buyerPOTable" border="1">
+        <!-- Buyer PO information: -->
+    </table>
+
+    <script>
+        function searchOrder() {
+            const orderId = document.getElementById('orderId').value;
+
+            fetch(`http://localhost:3000/Pending_Payments/${orderId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const buyerPOTable = document.getElementById('buyerPOTable');
+                    const tableHeaders = '<tr><th>Buyer Name</th><th>Order ID</th><th>Total</th><th>Payment Status</th></tr>';
+
+                    buyerPOTable.innerHTML = tableHeaders;
+
+                    const paymentStatus = data.payment_status === 1 ? 'Paid' : 'Unpaid';
+
+                    const row = `<tr>
+                                    <td>${data.buyer_name}</td>
+                                    <td>${data.order_id}</td>
+                                    <td>$${data.total}</td>
+                                    <td>${paymentStatus}</td>
+                                </tr>`;
+                    buyerPOTable.innerHTML += row;
+                })
+                .catch(error => console.error('Error fetching order:', error));
+        }
+
+        function updatePaymentStatus() {
+            const orderId = document.getElementById('orderId').value;
+            const checkbox = document.getElementById('paymentCheckbox');
+            const isChecked = checkbox.checked ? 1 : 0; // Convert to 1 or 0 for database
+
+            fetch(`http://localhost:3000/updatePaymentStatus/${orderId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status: isChecked })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Payment status updated:', data);
+                // You can perform additional actions after the update if needed
+            })
+            .catch(error => console.error('Error updating payment status:', error));
+        }
+    </script>
+</body>
+</html>

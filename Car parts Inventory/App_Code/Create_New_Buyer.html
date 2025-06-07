@@ -1,0 +1,51 @@
+<head><title>Create New Buyer Record In Database</title></head>
+
+<body><h1>Create New Buyer Record In Database</h1>
+
+<form id="buyerForm">
+  <label for="buyerName">Buyer Name:</label>
+  <input type="text" id="buyerName"><br><br>
+
+  <label for="street">Street:</label>
+  <input type="text" id="street"><br><br>
+
+  <label for="city">City:</label>
+  <input type="text" id="city"><br><br>
+
+  <label for="contact">Contact:</label>
+  <input type="text" id="contact"><br><br>
+
+  <button type="button" onclick="submitForm()">Submit</button>
+</form>
+</body>
+
+<script>
+  function submitForm() {
+    var buyer_name = document.getElementById("buyerName").value;
+    var street = document.getElementById("street").value;
+    var city = document.getElementById("city").value;
+    var contact = document.getElementById("contact").value;
+
+    // Fetch API to send data to the backend
+    fetch('/saveBuyerInfo', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        buyer_name,
+        street,
+        city,
+        contact,
+      }),
+    })
+      .then(response => response.json())
+      .then(data => {
+        // Handle response from the server.  I will figure out what to put here.
+        console.log(data);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  }
+</script>

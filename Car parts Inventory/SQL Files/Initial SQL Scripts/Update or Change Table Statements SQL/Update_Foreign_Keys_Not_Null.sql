@@ -1,0 +1,14 @@
+ALTER TABLE Parts
+MODIFY COLUMN category_id INT NOT NULL;
+
+ALTER TABLE Inventory
+MODIFY COLUMN vendor_id INT NOT NULL;
+
+ALTER TABLE Inventory
+MODIFY COLUMN part_id INT NOT NULL;
+
+ALTER TABLE Vendor_Part_Restock
+MODIFY COLUMN vendor_id INT NOT NULL;
+
+ALTER TABLE Vendor_Part_Restock
+MODIFY COLUMN part_id INT NOT NULL;
